@@ -1,0 +1,13 @@
+<h2><%= @games.map{|date, games| games.count}.reduce(:+) %> Games</h4>
+<%= link_to "Export Diffs", "/export_csv", target: "_blank" %>
+<% @games.each do |date, games| %>
+  <h4><%= date %></h4>
+  <table>
+    <% games.each do |game| %>
+      <tr>
+        <td><%= link_to game.to_s, game, target: "_blank" %></td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>
+  

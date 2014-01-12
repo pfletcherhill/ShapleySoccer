@@ -1,0 +1,67 @@
+<table>
+  <tr>
+    <td>Date</td>
+    <td><%= @game.date %></td>
+  </tr>
+  <tr>
+    <td>Home Team</td>
+    <td><%= link_to @game.home_team_name, @game.home_team %></td>
+  </tr>
+  <tr>
+    <td>Away Team</td>
+    <td><%= link_to @game.away_team_name, @game.away_team %></td>
+  </tr>
+  <tr>
+    <td>ESPN Link</td>
+    <td><%= link_to "Link", @game.espn_link, target: "_blank" %></td>
+  </tr>
+</table>
+
+<h3>Starters</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Player</th>
+      <th>Team</th>
+      <th>Shots</th>
+      <th>Shots on Goal</th>
+      <th>Goals</th>
+      <th>Assists</th>
+      <th>Offsides</th>
+      <th>Fouls Drawn</th>
+      <th>Fouls Committed</th>
+      <th>Saves</th>
+      <th>Yellows</th>
+      <th>Reds</th>
+    </tr>
+  </thead>
+  <% @game.starters.each do |starter| %>
+    <tr>
+      <td><%= link_to starter.player.name, starter.player %></td>
+      <td><%= link_to starter.team.name, starter.team %></td>
+      <% ["SH", "SG", "G", "A", "OF", "FD", "FC", "SV", "YC", "RC"].each do |key| %>
+        <td><%= starter.stat(key) %></td>
+      <% end %>
+    </tr>
+  <% end %>
+</table>
+
+<h3>Substitutions</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Player On</th>
+      <th>Player Off</th>
+      <th>Team</th>
+      <th>Time</th>
+    </tr>
+  </thead>
+  <% @game.substitutions.each do |sub| %>
+    <tr>
+      <td><%= link_to sub.player_in_name, sub.player_in.player %></td>
+      <td><%= link_to sub.player_out_name, sub.player_out.player %></td>
+      <td><%= link_to sub.team.name, sub.team %></td>
+      <td><%= sub.time %></td>
+    </tr>
+  <% end %>
+</table>

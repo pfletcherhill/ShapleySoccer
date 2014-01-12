@@ -1,0 +1,9 @@
+<table>
+  <% @teams.each do |team| %>
+    <tr>
+      <td><%= link_to team.name, team %></td>
+      <td><%= team.mean_score %></td>
+    </tr>
+  <% end %>
+</table>
+  

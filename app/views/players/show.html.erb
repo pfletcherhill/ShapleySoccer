@@ -1,0 +1,36 @@
+<%= @player.name %>
+<h3>Appearances</h3>
+<table>
+  <% @player.appearances.each do |app| %>
+    <tr>
+      <td><%= link_to ("#{app.game.to_s}"), app.game %></td>
+    </tr>
+  <% end %>
+</table>
+
+<h3>Full Stats 2013/2014</h3>
+<table>
+  <thead>
+    <tr>
+      <th>OVERALL</th>
+      <th>Shots</th>
+      <th>Shots on Goal</th>
+      <th>Goals</th>
+      <th>Assists</th>
+      <th>Offsides</th>
+      <th>Fouls Drawn</th>
+      <th>Fouls Committed</th>
+      <th>Saves</th>
+      <th>Yellows</th>
+      <th>Reds</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><%= @player.score %></td>
+      <% ["SH", "SG", "G", "A", "OF", "FD", "FC", "SV", "YC", "RC"].each do |key| %>
+        <td><%= @player.stat(key) %></td>
+      <% end %>
+    </tr>
+  </tbody>
+</table>

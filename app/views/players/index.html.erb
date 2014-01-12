@@ -1,0 +1,31 @@
+<h3><%= Player.count %> Players (Showing <%= @players.count %>)</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Scoring Index</th>
+      <th>Shots</th>
+      <th>Shots on Goal</th>
+      <th>Goals</th>
+      <th>Assists</th>
+      <th>Offsides</th>
+      <th>Fouls Drawn</th>
+      <th>Fouls Committed</th>
+      <th>Saves</th>
+      <th>Yellows</th>
+      <th>Reds</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @players.each do |player| %>
+      <tr>
+        <td><%= link_to player.name, player, target: "_blank" %></td>
+        <td><% player.score %></td>
+        <% ["SH", "SG", "G", "A", "OF", "FD", "FC", "SV", "YC", "RC"].each do |key| %>
+          <td><%= player.stat(key) %></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+  

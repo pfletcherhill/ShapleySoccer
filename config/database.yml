@@ -1,0 +1,23 @@
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: Soccer_development
+  pool: 5
+  username: pfletcherhill
+  password:
+
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: Soccer_test
+  pool: 5
+  username: pfletcherhill
+  password:
+
+production:
+  adapter: postgresql
+  encoding: unicode
+  database: Soccer_production
+  pool: 5
+  username: Soccer
+  password:

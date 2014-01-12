@@ -1,0 +1,41 @@
+<h2><%= @team.name %> (<%= link_to "ESPN", @team.espn_link, target: "_blank" %>)</h2>
+
+<h4>Players (<%= @team.players.uniq.map{|p| p.score}.sum / @team.players.uniq.count %>)</h4>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Scoring Index</th>
+      <th>Shots</th>
+      <th>Shots on Goal</th>
+      <th>Goals</th>
+      <th>Assists</th>
+      <th>Offsides</th>
+      <th>Fouls Drawn</th>
+      <th>Fouls Committed</th>
+      <th>Saves</th>
+      <th>Yellows</th>
+      <th>Reds</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @team.players.uniq.each do |player| %>
+      <tr>
+        <td><%= link_to player.name, player, target: "_blank" %></td>
+        <td><% player.score %></td>
+        <% ["SH", "SG", "G", "A", "OF", "FD", "FC", "SV", "YC", "RC"].each do |key| %>
+          <td><%= player.stat(key) %></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<h4>Games</h4>
+<table>
+  <% @team.games.each do |g| %>
+    <tr>
+      <td><%= link_to g.to_s, g %></td>
+    </tr>
+  <% end %>
+</table>
