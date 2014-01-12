@@ -1,28 +1,7 @@
-== README
+== Premier League Research
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This research project has two main objectives:
+* to centralize data on English Premier League matches and players
+* to build a successful model for predicting the outcome of games
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-
-
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+Thus far, the project consists of scripts to pull data on teams, games, and players from the web and a simple linear regression model for assessing the impact players have on goal differential. 
