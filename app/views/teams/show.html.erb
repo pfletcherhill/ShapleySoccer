@@ -22,7 +22,7 @@
     <% @team.players.uniq.each do |player| %>
       <tr>
         <td><%= link_to player.name, player, target: "_blank" %></td>
-        <td><% player.score %></td>
+        <td><%= player.score %></td>
         <% ["SH", "SG", "G", "A", "OF", "FD", "FC", "SV", "YC", "RC"].each do |key| %>
           <td><%= player.stat(key) %></td>
         <% end %>
