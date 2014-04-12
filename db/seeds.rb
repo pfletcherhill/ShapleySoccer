@@ -1,16 +1,4 @@
-stat_types = [
-  ["SH", "Shots"],
-  ["SG", "Shots on Goal"],
-  ["G", "Goals"],
-  ["A", "Assists"],
-  ["OF", "Offsides"],
-  ["FD", "Fouls Drawn"],
-  ["FC", "Fouls Committed"],
-  ["SV", "Saves"],
-  ["YC", "Yellow Cards"],
-  ["RC", "Red Cards"]
-]
-
-stat_types.each do |abbrev, name|
-  StatisticType.create(abbrev: abbrev, name: name)
+# Premier league season
+(Date.parse("August 17, 2013")..Date.today).each do |date|
+  Game.fetch_games_by_date(date)
 end

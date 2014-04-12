@@ -1,10 +1,5 @@
 class Player < ActiveRecord::Base
-  
-  # Attributes
-  # string: name
-  # integer: nationality_id
-  attr_accessible :name, :nationality_id, :espn_id
-  
+    
   validates_uniqueness_of :espn_id
   
   # Contracts and teams

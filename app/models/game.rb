@@ -1,12 +1,5 @@
 class Game < ActiveRecord::Base
-  
-  # Attributes:
-  # integer: home_team_id
-  # integer: away_team_id
-  # date: date
-  # integer: espn_id
-  attr_accessible :home_team_id, :away_team_id, :date, :espn_id
-  
+    
   # Teams
   belongs_to :away_team, class_name: "Team"
   belongs_to :home_team, class_name: "Team" 
@@ -57,11 +50,8 @@ class Game < ActiveRecord::Base
   
   # Goals
   def goals(team_id = nil)
-    goal_type = StatisticType.where(abbrev: "G").first
-    if goal_type
-      return statistics.joins(:appearance).where(statistic_type_id: goal_type.id, appearances: {team_id: team_id}) if team_id
-      return statistics.where(statistic_type_id: goal_type.id)
-    end
+    return statistics.joins(:appearance).where(stat_type: "g", appearances: {team_id: team_id}) if team_id
+    return statistics.where(stat_type: "g")
   end
   
   # Away Goals
@@ -108,21 +98,22 @@ class Game < ActiveRecord::Base
   
   # parse from ESPN
   # teams, appearances (subs)
-  def parse_from_espn
-    agent = Mechanize.new
+  def parse_from_espn(agent = Mechanize.new)
+    print "Parsing Game #{self.id} from ESPN..."
     begin
       parse_teams(agent)
       parse_appearances(agent)
       parse_stats(agent)
+      print "DONE\n"
     rescue => e
-      print  "ERROR parsing game #{id} (#{espn_link}): #{e}"
+      print  "ERROR parsing game #{id} (#{espn_link}): #{e}\n"
     end
   end
   
   # fill in home, away team info
   def parse_teams(agent = Mechanize.new)
     begin
-      page = agent.get(espn_stats_link)
+      page = agent.get(self.espn_stats_link)
       home_id = page.search(".match .away")[0]["id"].split("teamId-", 2).last
       self.home_team = Team.where(espn_id: home_id).first
       away_id = page.search(".match .home")[0]["id"].split("teamId-", 2).last
@@ -168,9 +159,11 @@ class Game < ActiveRecord::Base
                                 time_on: time)
               substitution.player_in = appearance
             elsif sub_index == 1 # sub out
-              appearance = appearances.where(player_id: player.id).first
-              appearance.time_off = time
-              appearance.save
+              appearance = appearances.find_by(player_id: player.id)
+              if appearance
+                appearance.time_off = time
+                appearance.save
+              end
               substitution.player_out = appearance
             end
             substitution.save
@@ -189,20 +182,19 @@ class Game < ActiveRecord::Base
       page.search(".mod-container .stat-table tr").each do |row|
         if link = row.search("td a").first # validate row
           id = link["href"].split("_/id/", 2).last.split("/", 2).first
-          player = self.players.where(espn_id: id).first
-          app = appearances.where(player_id: player.id).first if player
+          player = self.players.find_by(espn_id: id)
+          app = appearances.find_by(player: player) if player
           if app # if player played
-            stats_table_key = ["SH", "SG", "G", "A", "OF", "FD", "FC", "SV", "YC", "RC"]
+            stats_table_key = Statistic::TYPES
             row.search("td")[3..12].each_with_index do |stat, i|
-              stat_type = StatisticType.where(abbrev: stats_table_key[i]).first
-              Statistic.create(statistic_type_id: stat_type.id, appearance_id: app.id,
-                              value: stat.text.to_f) if stat_type && stat.text.to_i > 0
+              Statistic.create(stat_type: stats_table_key[i], appearance: app,
+                               value: stat.text.to_f) if stat.text.to_i > 0
             end
           end
         end
       end
     rescue => e
-      print "ERROR parsing goals for game #{id} (#{espn_link}): #{e}"
+      print "ERROR parsing stats for game #{id} (#{espn_link}): #{e}"
     end
   end
   
@@ -212,10 +204,9 @@ class Game < ActiveRecord::Base
     array = [self.id]
     home_stats = statistics.joins(:appearance).where(appearances: {team_id: home_team.id})
     away_stats = statistics.joins(:appearance).where(appearances: {team_id: away_team.id})
-    ["SH", "SG", "G", "A", "OF", "FD", "FC", "SV", "YC", "RC"].each do |key|
-      stat_type = StatisticType.find_by_abbrev(key)
-      home_val = home_stats.where(statistic_type_id: stat_type.id).map{|s| s.value}.sum
-      away_val = away_stats.where(statistic_type_id: stat_type.id).map{|s| s.value}.sum
+    Statistic::TYPES.each do |key|
+      home_val = home_stats.where(stat_type: key).map{|s| s.value}.sum
+      away_val = away_stats.where(stat_type: key).map{|s| s.value}.sum
       array << home_val - away_val
     end
     return array
@@ -224,20 +215,20 @@ class Game < ActiveRecord::Base
   # Ruby date object passed in
   # Fetch espn_id and date
   def self.fetch_games_by_date (fetch_date)
-    link = "http://espnfc.com/scores/_/date/#{fetch_date.strftime('%Y%m%d')}/league/eng.1"
+    url = "http://espnfc.com/scores/_/date/#{fetch_date.strftime('%Y%m%d')}/league/eng.1"
     agent = Mechanize.new
     begin
-      page = agent.get(link)
+      page = agent.get(url)
       page.search(".gamebox").each do |fixture|
         game_link = fixture.search(".teams a").first["href"]
         id = game_link.split("/report/", 2).last.split("/", 2).first if game_link
         if id && id.to_i > 0
           game = Game.find_or_create_by(espn_id: id, date: fetch_date)
-          game.parse_from_espn if game
+          game.try(:parse_from_espn, agent)
         end
       end
     rescue => e
-      print "ERROR fetching games for date #{fetch_date} (#{link}): #{e}"
+      print "ERROR fetching games for date #{fetch_date} (#{url}): #{e}"
     end
   end
   

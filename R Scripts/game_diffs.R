@@ -1,4 +1,4 @@
-setwd("~/Websites/Soccer/r")
+setwd("~/Websites/Soccer/R\ Scripts")
 games <- read.csv("game_diffs.csv", header=T)
 names(games) <- c("id", "sh", "sg", "g", "a", "of", "fd", "fc", "sv", "yc", "rc")
 
@@ -31,3 +31,13 @@ summary(fit)
 # Shots and shots on goal are highly correlated
 fit <- lm(g ~ sg + sv + a + rc, data=games)
 summary(fit)
+
+# Create win column (loss = -1, tie = 0, win = 1)
+games$win <- games$g / abs(games$g)
+games['win'] <- rapply( games['win'], f=function(x) ifelse(is.nan(x),0,x), how="replace" )
+
+# Multivariable analysis (ind var of win)
+win.model <- lm(win ~ sh + sg + a + of + fd + fc + sv + yc + rc, data=games)
+summary(win.model)
+
+

@@ -1,13 +1,5 @@
 class Appearance < ActiveRecord::Base
   
-  # Attributes:
-  # integer: game_id
-  # integer: player_id
-  # integer: team_id
-  # float: time_on
-  # float: time_off
-  attr_accessible :game_id, :player_id, :team_id, :time_on, :time_off
-
   # Associations
   belongs_to :player
   belongs_to :game
@@ -30,15 +22,9 @@ class Appearance < ActiveRecord::Base
     return false
   end
   
-  # ["SH", "SG", "G", "A", "OF", "FD", "FC", "SV", "YC", "RC"]
   def stat(key)
-    type = StatisticType.find_by_abbrev(key)
-    stat = statistics.where(statistic_type_id: type.id).first
-    if stat
-      return stat.value
-    else
-      return 0
-    end
+    stat = statistics.where(stat_type: key).first
+    return stat ? stat.value : 0
   end
   
 end
