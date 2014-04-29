@@ -5,6 +5,7 @@ class Player < ActiveRecord::Base
   # Contracts and teams
   has_many :contracts
   has_many :teams, through: :contracts
+  has_and_belongs_to_many :coalitions, -> { uniq }
   
   # Appearances
   has_many :appearances

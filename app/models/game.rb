@@ -40,12 +40,12 @@ class Game < ActiveRecord::Base
   
   # Away team name (error handling)
   def away_team_name
-    return away_team.name if away_team
+    return away_team.try(:name)
   end
   
   # Home team name (error handling)
   def home_team_name
-    return home_team.name if home_team
+    return home_team.try(:name)
   end
   
   # Goals
@@ -93,6 +93,51 @@ class Game < ActiveRecord::Base
       return home_team
     else
       return nil
+    end
+  end
+      
+  def appearances_with_options(options = {})
+    apps = self.appearances
+    
+    # By team (home or away)
+    if options[:team]
+      apps = apps.where(team_id: options[:team].id)
+    end
+    
+    # By time (at specified time)
+    if options[:time]
+      time = options[:time]
+      apps = apps.where("time_on <= ? AND (time_off > ? OR time_off IS NULL)", time, time)
+    end
+    return apps
+  end
+  
+  # Coalitions
+  def coalitions
+    self.teams.map{ |team|
+      coalitions_by_team(team)
+    }.inject(:+)
+  end
+  
+  # TODO: Handle extra time
+  # Returns coalitions of the form {[app_ids] => minutes_count}
+  def coalitions_by_team(team)
+    (1..90).map{|time| appearances_with_options({team: team, time: time}).map{|a| a.id}}.uniq
+  end
+  
+  # For each set of appearance ids, find coalition (intersection)
+  # of players.coalitions. Add appearances to coalition
+  def increment_coalitions
+    self.coalitions.each do |app_ids|
+      apps = Appearance.where(id: app_ids)
+      players = apps.map{|a| a.player}
+      coalition = Coalition.find_by_players(players)
+      unless coalition
+        coalition = Coalition.new
+        coalition.players << players
+        coalition.save
+      end
+      coalition.appearances << apps # Add appearances to coalition
     end
   end
   

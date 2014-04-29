@@ -4,6 +4,7 @@ class Appearance < ActiveRecord::Base
   belongs_to :player
   belongs_to :game
   belongs_to :team
+  has_and_belongs_to_many :coalitions, -> { uniq }
   has_many :statistics
   
   # Substitutions

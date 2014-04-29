@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140111162516) do
+ActiveRecord::Schema.define(version: 20140429031725) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,9 +20,30 @@ ActiveRecord::Schema.define(version: 20140111162516) do
     t.integer "game_id"
     t.integer "player_id"
     t.integer "team_id"
+    t.integer "coalition_id"
     t.float   "time_on"
     t.float   "time_off"
   end
+
+  create_table "appearances_coalitions", id: false, force: true do |t|
+    t.integer "appearance_id", null: false
+    t.integer "coalition_id",  null: false
+  end
+
+  add_index "appearances_coalitions", ["appearance_id"], name: "index_appearances_coalitions_on_appearance_id", using: :btree
+
+  create_table "coalitions", force: true do |t|
+    t.float "scored"
+    t.float "conceded"
+    t.float "minutes"
+  end
+
+  create_table "coalitions_players", id: false, force: true do |t|
+    t.integer "coalition_id", null: false
+    t.integer "player_id",    null: false
+  end
+
+  add_index "coalitions_players", ["player_id"], name: "index_coalitions_players_on_player_id", using: :btree
 
   create_table "contracts", force: true do |t|
     t.integer "player_id"
