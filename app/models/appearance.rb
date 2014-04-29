@@ -6,6 +6,7 @@ class Appearance < ActiveRecord::Base
   belongs_to :team
   has_and_belongs_to_many :coalitions, -> { uniq }
   has_many :statistics
+  has_many :goals
   
   # Substitutions
   has_one :substitution_in, foreign_key: :player_in_id, class_name: "Substitution"

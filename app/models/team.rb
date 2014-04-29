@@ -10,7 +10,7 @@ class Team < ActiveRecord::Base
   
   # Appearances and Substitutions
   has_many :appearances
-  has_many :players, through: :appearances
+  has_many :players, -> { uniq }, through: :appearances
   has_many :substitutions
   
   # Validations

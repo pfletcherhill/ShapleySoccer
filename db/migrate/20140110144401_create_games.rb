@@ -5,6 +5,7 @@ class CreateGames < ActiveRecord::Migration
       t.integer :away_team_id
       t.date :date
       t.integer :espn_id
+      t.string :api_id
     end
   end
 end
