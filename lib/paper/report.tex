@@ -1,0 +1,42 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{bold-extra}
+\usepackage{mathtools}
+\usepackage{amssymb}
+
+\newcommand{\br}{\\[10pt]}
+\let\emptyset\varnothing
+
+\lstset{ %
+  frame=single,
+  numbers=left,
+  language=Ruby
+}
+
+\begin{document}
+  \title{Computing Shapley Values in the English Premier League}
+  \author{Paul Fletcher-Hill}
+  \maketitle
+  \section*{Introduction}
+  In 1953, Lloyd Shapley introduced the concept of a Shapley value for coalitional games. Using four convenient axioms, the innovation allows the calculation of a unique distribution of the game’s surplus among its players, representative of their marginal power. The Shapley value has successfully been used in many political and economic games. In soccer, like many other sports, rating players is often a shallow and arbitrary process. Simple metrics, such as goals, shots or saves, are easily digestible, but they hardly encapsulate the actual value of a player while he is on the field. This paper attempts to apply the Shapley value framework to soccer teams, specifically teams in the English Premier League, with the hope that a more nuanced, teamwork-based measurement of a player’s contribution will arise.
+  
+  \section*{The Shapley Value}
+  We will begin with a review of coalitional games and the Shapley value. A coalitional game consists of a set of players $N = \{1, 2, ..., n\}$ and a payoff function $v : 2^N \rightarrow \mathbb{R}$. $v(S)$ represents the payoff coalition $S$ can achieve in the game and $v(\emptyset) = 0$. 
+  \br
+  The set $\phi(v)$ represents the Shapley values for the game, and $\phi_i(v)$ is player $i$'s value, or the measure of player $i$'s power in the game. This is intuitively a measure of how important player $i$ is to the game's overall payoff.
+  \br
+  Shapley defined four axioms to uniquely define each distribution $\phi(v)$. The axioms are as follows:
+  \begin{enumerate}
+    \item Symmetry condition: if $i$ and $j$ are substitutes in $v$, then $\phi_i(v) = \phi_j(v)$.
+    \item Null player condition: if $i$ is a null player, then $\phi_i(v) = 0$.
+    \item Efficiency condition: $\sum\limits_{i=1}^{n} \phi_i(v) = v(N)$.
+    \item Additivity condition: $\phi_i(v + w) = \phi_i(v) + \phi_i(w)$.
+  \end{enumerate}
+  The above axioms can be used to determine the Shapley value of a single player. Consider the following formula for finding the value for player $i$:
+  \begin{center}
+    $\phi_i(v) = \frac{1}{|N|!} \sum\limits_{R}[v(S_i \cup \{i\}) - v(S_i)]$
+  \end{center}
+  where $R$ runs over all $|N|!$ different orders on $N$, and $S_i$ is the set of players preceding player $i$ in the order $R$.
+  
+\end{document}

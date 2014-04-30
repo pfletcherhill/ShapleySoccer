@@ -6,11 +6,11 @@ class Team < ActiveRecord::Base
   
   # Contracts and players
   has_many :contracts
-  #has_many :players, through: :contracts
   
   # Appearances and Substitutions
   has_many :appearances
   has_many :players, -> { uniq }, through: :appearances
+  has_many :coalitions, -> { uniq }, through: :players
   has_many :substitutions
   
   # Validations

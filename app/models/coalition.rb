@@ -9,8 +9,16 @@ class Coalition < ActiveRecord::Base
     players.map{|p| p.coalitions}.inject(:&).first
   end
   
+  def self.union_of_players(players = [])
+    players.map{|p| p.coalitions}.inject(:|)
+  end
+  
   def value
-    (self.scored - self.conceded) / self.minutes
+    goals_diff / self.minutes
+  end
+  
+  def goals_diff
+    (self.scored - self.conceded)
   end
   
 end

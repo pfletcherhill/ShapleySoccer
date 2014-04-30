@@ -41,12 +41,15 @@ module ESPN
       end
     end
 
+    def timeline_link
+      "http://www.espnfc.com/gamepackage10/data/timeline?gameId=#{espn_id}"
+    end
+    
     def parse_timeline
       begin
         require 'open-uri'
         print "Parsing timeline for game #{id}..."
-        url = "http://www.espnfc.com/gamepackage10/data/timeline?gameId=#{espn_id}"
-        xml = Nokogiri::XML(open(url))
+        xml = Nokogiri::XML(open(timeline_link))
         File.open("lib/data/epa/#{self.date.to_s}-#{self.espn_id}.xml", "w+") {|file| xml.write_xml_to(file)}
         print "DONE\n"
       rescue => e
@@ -72,12 +75,15 @@ module ESPN
       end
     end
     
+    def gamecast_link
+      "http://www.espnfc.com/gamepackage10/data/gamecast?gameId=#{espn_id}"
+    end
+    
     def parse_gamecast
       begin
         require 'open-uri'
         print "Parsing gamecast for game #{id}..."
-        url = "http://www.espnfc.com/gamepackage10/data/gamecast?gameId=#{espn_id}"
-        xml = Nokogiri::XML(open(url))
+        xml = Nokogiri::XML(open(gamecast_link))
         File.open("lib/data/epa/gamecast/#{self.date.to_s}-#{self.espn_id}.xml", "w+") {|file| xml.write_xml_to(file)}
         print "DONE\n"
       rescue => e
@@ -91,32 +97,28 @@ module ESPN
     def parse_appearances(agent = Mechanize.new)
       begin
         page = agent.get(espn_link)
-        home_starters = page.search(".span-3.column .first a")[1..11]
-        away_starters = page.search(".span-3.column .last a")[1..11]
+        home_starters = page.search(".span-3.column")[2].search(".first a")
+        away_starters = page.search(".span-3.column")[3].search(".last a")
         [home_starters, away_starters].compact.each_with_index do |starters, i|
           starters.each do |starter|
             id = starter["href"].split("_/id/", 2).last.split("/", 2).first
-            player = Player.where(espn_id: id).first
-            player = Player.create(espn_id: id, name: starter.text) unless player
-            Appearance.create(game_id: self.id, player_id: player.id, 
-                              team_id: i > 0 ? away_team_id : home_team_id,
-                              time_on: 0)
+            player = Player.find_or_create_by(espn_id: id, name: starter.text)
+            Appearance.create(game: self, player: player, team: i > 0 ? away_team : home_team, time_on: 0)
           end
         end
+        
         home_subs = page.search(".gamecast-stat-0")[0].search("td")
         away_subs = page.search(".gamecast-stat-1")[0].search("td")
         [home_subs, away_subs].compact.each_with_index do |subs, i|
           subs.each do |sub|
             time = sub.text.split("(", 2).last.split("')", 2).first.to_i
-            substitution = Substitution.new(time: time, game_id: self.id,
-                                            team_id: i > 0 ? away_team_id: home_team_id)
+            substitution = Substitution.new(time: time, game: self, team: i > 0 ? away_team : home_team)
             sub.search("a").each_with_index do |subst, sub_index|
               id = subst["href"].split("_/id/", 2).last.split("/", 2).first
-              player = Player.where(espn_id: id).first
-              player = Player.create(espn_id: id, name: subst.text) unless player
+              player = Player.find_or_create_by(espn_id: id, name: subst.text)
               if sub_index == 0 # sub in
-                appearance = Appearance.find_or_create_by(game_id: self.id, player_id: player.id,
-                                  team_id: i > 0 ? away_team_id : home_team_id,
+                appearance = Appearance.find_or_create_by(game: self, player: player,
+                                  team: i > 0 ? away_team : home_team,
                                   time_on: time)
                 substitution.player_in = appearance
               elsif sub_index == 1 # sub out
