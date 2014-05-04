@@ -1,3 +1,3 @@
-== Premier League Research
+== Computing Shapley Values in the English Premier League
 
 In 1953, Lloyd Shapley introduced the concept of a Shapley value for coalitional games. Using four convenient axioms, the innovation allows the calculation of a unique distribution of the game’s surplus among its players, representative of their marginal power. The Shapley value has successfully been used in many political and economic games. In soccer, like many other sports, rating players is often a shallow and arbitrary process. Simple metrics, such as goals, shots or saves, are easily digestible, but they hardly encapsulate the actual value of a player while he is on the field. This paper attempts to apply the Shapley value framework to soccer teams, specifically the 2013-2014 Arsenal Football Club in the English Premier League, with the hope that a more nuanced, teamwork-based measurement of a player’s contribution will arise.
