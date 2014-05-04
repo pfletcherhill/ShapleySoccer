@@ -1,5 +1,5 @@
 class Player < ActiveRecord::Base
-    
+  
   validates_uniqueness_of :espn_id
   
   # Contracts and teams
@@ -51,7 +51,8 @@ class Player < ActiveRecord::Base
   def self.shapley_values(players_array = [], coal_func = "value")
     sums = {}
     players_array.each{|p| sums[p.id] = 0}
-    players_array.permutation.to_a.each do |perm|
+    (0..(players_array.perms_count - 1)).each do |perm_index|
+      perm = players_array.ith_perm(perm_index)
       perm.each_with_index do |player, i|
         now = Coalition.union_of_players(perm[0..i]).map{|c| c.send(coal_func)}.reduce(:+)
         if i > 0

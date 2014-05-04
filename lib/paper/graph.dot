@@ -1,0 +1,24 @@
+digraph {
+  node[shape="record" style="rounded"]
+  p1[label="Player C"]
+  p2[label="Player B"]
+  p3[label="Player A"]
+  p4[label="Player D"]
+  p5[label="Player E"]
+  l1[label="Lineup 1\nScored: 1\nConceded: 0\nMinutes: 45"]
+  l2[label="Lineup 3\nScored: 1\nConceded: 2\nMinutes: 90"]
+  l3[label="Lineup 2\nScored: 3\nConceded: 1\nMinutes: 120"]
+  
+  l1 -> p1
+  l1 -> p2
+  l1 -> p3
+  
+  l2 -> p1
+  l2 -> p4
+  l2 -> p5
+  
+  l3 -> p2
+  l3 -> p3
+  l3 -> p4
+
+}
